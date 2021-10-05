@@ -41,7 +41,7 @@ def checkmsg(dirname, msgname):
 
 # data type check
 def decryptpos(msgname):
-    msgsize = {'std_msgs/Header' : ['header',28],
+    msgsize = {'std_msgs/Header' : ['header',28], # header 수정필요
                 'geometry_msgs/Vector3' : ['ddd',[8,8,8]],
                 'InsGnssSummaryT': ['fffff',20], # 크기를 알 수 없음
                 'float32' : ['f',4],
