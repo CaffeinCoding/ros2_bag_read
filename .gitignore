@@ -1,0 +1,8 @@
+/bag_data
+/msgfiles
+/ros_data
+*.zip
+*.msg
+*.txt
+
+test.py
