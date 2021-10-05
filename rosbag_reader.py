@@ -77,7 +77,7 @@ for i_index, i in enumerate(topic_df):
     for j in msg_df:
         if i[0] == j[0]:
             tmp_df[i_index].append(j)
-
+            
 # msg 파일 선택
 # 폴더에서 전부 긁어와서 리스트에 저장
 key = checkmsg(msgfiledir,'Vn300.msg')
