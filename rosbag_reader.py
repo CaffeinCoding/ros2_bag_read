@@ -41,7 +41,7 @@ def checkmsg(dirname, msgname):
 
 # data type check
 def decryptpos(msgname):
-    msgsize = {'std_msgs/Header' : ['header',28], # header 수정필요
+    msgsize = {'std_msgs/Header' : ['Id',28], # header 수정필요
                 'geometry_msgs/Vector3' : ['ddd',[8,8,8]],
                 'InsGnssSummaryT': ['fffff',20], # 크기를 알 수 없음
                 'float32' : ['f',4],
@@ -58,7 +58,7 @@ def decryptpos(msgname):
 # bag 읽어오기
 db_name = '/ros_data/rosbag2_2021_04_15-16_34_39_0.db3'
 db_name = db_name.split('.')[0]
-con = sqlite3.connect('/home/krri/bag_check/rosbag2_2021_04_15-16_34_39/rosbag2_2021_04_15-16_34_39_0.db3')
+con = sqlite3.connect('/home/krri/bag_check/ros_data/rosbag2_2021_04_15-16_34_39/rosbag2_2021_04_15-16_34_39_0.db3')
 
 df_topic = pd.read_sql_query("SELECT id, type from topics WHERE type='custom_msg/msg/Vn300'", con)
 df_msg = pd.read_sql_query("SELECT * from messages", con)
