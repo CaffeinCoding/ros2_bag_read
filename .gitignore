@@ -1,9 +1,13 @@
 /bag_data
-/msgfiles
+/src/custom_msg
 /ros_data
 /rcl_test
+/build
+/install
+/log
 *.zip
 *.msg
 *.txt
+*.db3*
 
 test.py
