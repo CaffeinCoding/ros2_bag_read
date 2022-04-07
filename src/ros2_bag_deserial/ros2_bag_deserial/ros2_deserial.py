@@ -45,6 +45,7 @@ class ReadBag():
         o3d.io.write_point_cloud(file_name, pcd_xyz)
 
     # lidar to numpy (get x, y, z, rgb point)
+    # if you want other field data then add code for each field data
     # need data option select 
     def bag_lidar_to_numpy(self, lidar_msg, row_step):
         msg_np = rnp.pointcloud2_to_array(lidar_msg)

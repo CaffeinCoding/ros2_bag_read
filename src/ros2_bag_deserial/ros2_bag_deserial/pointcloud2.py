@@ -32,7 +32,6 @@ def fields_to_dtype(fields, point_step):
     np_dtype_list = []
     for f in fields:
         while offset < f.offset:
-            # might be extra padding between fields
             np_dtype_list.append(
                 ('%s%d' % (DUMMY_FIELD_PREFIX, offset), np.uint8))
             offset += 1
@@ -44,7 +43,6 @@ def fields_to_dtype(fields, point_step):
         np_dtype_list.append((f.name, dtype))
         offset += pftype_sizes[f.datatype] * f.count
 
-    # might be extra padding between points
     while offset < point_step:
         np_dtype_list.append(('%s%d' % (DUMMY_FIELD_PREFIX, offset), np.uint8))
         offset += 1
@@ -52,12 +50,9 @@ def fields_to_dtype(fields, point_step):
     return np_dtype_list
 
 def pointcloud2_to_array(cloud_msg, squeeze=True):
-    # construct a numpy record type equivalent to the point type of this cloud
     dtype_list = fields_to_dtype(cloud_msg.fields, cloud_msg.point_step)
-    # parse the cloud into an array
     cloud_arr = np.frombuffer(cloud_msg.data, dtype_list)
 
-    # remove the dummy fields that were added
     cloud_arr = cloud_arr[
         [fname for fname, _type in dtype_list if not (
             fname[:len(DUMMY_FIELD_PREFIX)] == DUMMY_FIELD_PREFIX)]]

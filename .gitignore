@@ -5,6 +5,7 @@
 /build
 /install
 /log
+*.pyc
 *.zip
 *.msg
 *.txt
