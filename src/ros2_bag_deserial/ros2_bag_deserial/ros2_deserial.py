@@ -11,10 +11,6 @@ import yaml
 
 set_file_path = './src/ros2_bag_deserial/bag_setting/setting.yaml'
 
-# ObsData sim_frame 기준
-global cam_sim_frame
-cam_sim_frame = '1'
-
 class ReadBag():
     def __init__(self):
         bag_set = self.load_setting()
@@ -26,8 +22,9 @@ class ReadBag():
         self.csv_topics = bag_set['csv_topics']
         self.custom_topics = bag_set['custom_topics']
         self.option_list = bag_set['option_list']
-        self.all_option = False
-        self.sim_data = True #save sim_frame
+        self.cam_sim_frame = '1' # ObsData sim_frame 기준
+        # self.all_option = bag_set['all_option']
+        self.sim_data = bag_set['sim_data'] #save sim_frame
         
     def load_setting(self):
         with open(set_file_path, 'r', encoding='utf-8') as f:
@@ -70,15 +67,16 @@ class ReadBag():
     # msg data to csv and save    
     def msg_to_csv(self, msg, t, dir_name):
         attr_list = []
-        if(self.all_option): # check all option or select option list
-            for msg_attr in dir(msg):
-                if(msg_attr[0] != '_'):
+        # all_options is not work now
+        # if(self.all_option): # check all option or select option list
+        #     for msg_attr in dir(msg):
+        #         if(msg_attr[0] != '_' and msg_attr[0] != 'SLOT_TYPES'):
+        #             attr_list.append(msg_attr)
+        # else:
+        for msg_attr in dir(msg):
+            for option in self.option_list:
+                if(msg_attr == option):
                     attr_list.append(msg_attr)
-        else:
-            for msg_attr in dir(msg):
-                for option in self.option_list:
-                    if(msg_attr == option):
-                        attr_list.append(msg_attr)
         msg_data = []
         for attr in attr_list:
             msg_data.append(getattr(msg,attr))
@@ -93,9 +91,7 @@ class ReadBag():
     obj to csv and save
     '''
     def obj_to_csv(self, obs_msg, t, dir_name):
-        global cam_sim_frame
-        cam_sim_frame = str(obs_msg.sim_frame)
-        # print(print(dir(obs_msg)))
+        self.cam_sim_frame = str(obs_msg.sim_frame)
         objs = obs_msg.obj
         attrs = [att for att in dir(objs[0]) if att.split('_')[0] == 'front' or att.split('_')[0] == 'rear']
         obj_arr = []
@@ -108,7 +104,7 @@ class ReadBag():
         obj_df = pd.DataFrame(obj_arr, index=index_arr, columns=['x','y','z'])
         
         if(self.sim_data):
-            file_name = self.set_name(cam_sim_frame, dir_name)
+            file_name = self.set_name(self.cam_sim_frame, dir_name)
         else:
             file_name = self.set_name(t, dir_name)
         
@@ -125,15 +121,6 @@ class ReadBag():
         else:
             file_name = self.save_dir + dir_name + '/' + str(int(t/1000000))
         return file_name
-
-    # def get_attr(msg_data):
-    #     attr_list = []
-    #     for attr in dir(msg_data):
-    #         print(attr)
-    #         if(attr[0] != '_'):
-    #             attr_list.append(attr)
-
-    #     return attr_list
 
     # read bag
     def run(self):
@@ -157,8 +144,6 @@ class ReadBag():
 
         storage_filter = rosbag2_py.StorageFilter(self.topic_list)
         reader.set_filter(storage_filter)
-        
-        global cam_sim_frame
 
         i = 0
         while reader.has_next():
@@ -171,16 +156,15 @@ class ReadBag():
                 msg_xyz, msg_color = self.bag_lidar_to_numpy(msg, msg.row_step)
                 
                 if(self.sim_data):
-                    self.bag_to_pcd(msg_xyz, msg_color, sim_frame, topic) 
-                else:
-                    self.bag_to_pcd(msg_xyz, msg_color, timestamp, topic)
+                    timestamp = sim_frame 
+
+                self.bag_to_pcd(msg_xyz, msg_color, timestamp, topic)
             
             if(topic in self.cam_topics):
                 if(self.sim_data):
-                    # global cam_sim_frame
-                    self.bag_to_img(msg, cam_sim_frame, topic)
-                else:
-                    self.bag_to_img(msg, timestamp, topic)
+                    timestamp = self.cam_sim_frame
+                    
+                self.bag_to_img(msg, timestamp, topic)
             
             # ObsData
             if(topic in self.custom_topics):
@@ -189,9 +173,9 @@ class ReadBag():
             # ego_pose
             if(topic in self.csv_topics):
                 if(self.sim_data):
-                    self.msg_to_csv(msg, cam_sim_frame, topic)
-                else:
-                    self.msg_to_csv(msg, timestamp, topic)
+                    timestamp = self.cam_sim_frame
+                
+                self.msg_to_csv(msg, timestamp, topic)
             
             i += 1
             print(f'processing..{i}\r', end='')
