@@ -190,18 +190,13 @@ def main():
     bag_name = readbag.bag_uri.split('/')[-1]
     bag_name = bag_name.split('.')[0]
     
-    data_dir = "./bag_data"
-    if (not os.path.isdir(data_dir)):
-        os.mkdir(data_dir)
-        
-    data_dir += "/" + bag_name
+    data_dir = "./bag_data/" + bag_name
     readbag.save_dir = data_dir
-    
     if (not os.path.isdir(data_dir)):
-        os.mkdir(data_dir)
+        os.makedirs(data_dir)
     
     for topic_name in readbag.topic_list:
         if(not os.path.isdir(data_dir + topic_name)):
-            os.mkdir(data_dir + topic_name)
+            os.makedirs(data_dir + topic_name)
     
     readbag.run()
