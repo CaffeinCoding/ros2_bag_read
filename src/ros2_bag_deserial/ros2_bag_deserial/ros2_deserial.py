@@ -52,7 +52,7 @@ class ReadBag():
         msg_x = msg_np['x'].reshape(-1,1)
         msg_y = msg_np['y'].reshape(-1,1)
         msg_z = msg_np['z'].reshape(-1,1)
-        msg_intensity = msg_np['rgb'].reshape(-1,1)
+        msg_intensity = msg_np['rgb'].reshape(-1,1) # update field name (ex. intensity, rgba else)
         msg_xyz = np.concatenate((msg_x,msg_y,msg_z), axis=1)
         
         return msg_xyz, msg_intensity
