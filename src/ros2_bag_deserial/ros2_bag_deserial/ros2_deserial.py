@@ -9,6 +9,9 @@ import cv2
 import pandas as pd
 import yaml
 
+device = o3d.core.Device("CPU:0")
+dtype = o3d.core.float32
+
 set_file_path = './src/ros2_bag_deserial/bag_setting/setting.yaml'
 
 class ReadBag():
@@ -32,14 +35,14 @@ class ReadBag():
             return bag_set
 
     # lidar bag to pcd and save
-    def bag_to_pcd(self, xyz, color, t, dir_name):
+    def bag_to_pcd(self, xyz, intensity, t, dir_name):
         file_name = self.set_name(t, dir_name)
         file_name = file_name + ".pcd"
-        pcd_xyz = o3d.geometry.PointCloud()
-        pcd_xyz.points = o3d.utility.Vector3dVector(xyz)
-        pcd_xyz.colors = o3d.utility.Vector3dVector(color)
+        pcd = o3d.t.geometry.PointCloud(device)
+        pcd.point['positions'] = o3d.core.Tensor(xyz, dtype, device)
+        pcd.point['intensities'] = o3d.core.Tensor(intensity,dtype,device) # intensity
         
-        o3d.io.write_point_cloud(file_name, pcd_xyz)
+        o3d.t.io.write_point_cloud(file_name, pcd)
 
     # lidar to numpy (get x, y, z, rgb point)
     # if you want other field data then add code for each field data
@@ -49,12 +52,10 @@ class ReadBag():
         msg_x = msg_np['x'].reshape(-1,1)
         msg_y = msg_np['y'].reshape(-1,1)
         msg_z = msg_np['z'].reshape(-1,1)
-        msg_rgb = msg_np['rgb'].reshape(-1,1)
-        msg_color = np.empty([row_step, 3], dtype=np.float32)
-        msg_color[:] = msg_rgb[:]/-255
+        msg_intensity = msg_np['rgb'].reshape(-1,1)
         msg_xyz = np.concatenate((msg_x,msg_y,msg_z), axis=1)
         
-        return msg_xyz, msg_color
+        return msg_xyz, msg_intensity
     
     # bag to img // 그냥 이미지
     # bag to img and save // 압축이미지
@@ -153,12 +154,12 @@ class ReadBag():
             
             if(topic in self.lidar_topics):
                 sim_frame = msg.header.stamp.sec
-                msg_xyz, msg_color = self.bag_lidar_to_numpy(msg, msg.row_step)
+                msg_xyz, msg_intensity = self.bag_lidar_to_numpy(msg, msg.row_step)
                 
                 if(self.sim_data):
                     timestamp = sim_frame 
 
-                self.bag_to_pcd(msg_xyz, msg_color, timestamp, topic)
+                self.bag_to_pcd(msg_xyz, msg_intensity, timestamp, topic)
             
             if(topic in self.cam_topics):
                 if(self.sim_data):
