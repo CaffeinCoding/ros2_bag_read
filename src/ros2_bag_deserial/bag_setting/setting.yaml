@@ -1,4 +1,4 @@
-bag_uri : '/home/jt/ros_bag_deserial/ros2_bag_read/rosbag2_2021_12_13-16_07_55_0.db3'
+bag_uri : './rosbag2_2021_12_13-16_07_55_0.db3'
 lidar_topics : ['/pcl_output_fl','/pcl_output_fr','/pcl_output_rl','/pcl_output_rr']
 cam_topics : ['/compressed_image_frontleft_output', '/compressed_image_frontright_output',
                   '/compressed_image_rearleft_output', '/compressed_image_rearright_output']
