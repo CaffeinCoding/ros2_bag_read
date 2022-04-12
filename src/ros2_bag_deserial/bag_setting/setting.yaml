@@ -5,4 +5,5 @@ cam_topics : ['/compressed_image_frontleft_output', '/compressed_image_frontrigh
 csv_topics : ['/ego_pose']
 custom_topics : ['/ObsData']
 option_list : ['f_pose_x','f_pose_y','f_pose_z','f_roll','f_pitch','f_yaw']
+lidar_color : False
 sim_data : False
