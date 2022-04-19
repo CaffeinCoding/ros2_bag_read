@@ -169,18 +169,18 @@ class ReadBag():
 
                 self.bag_to_pcd(msg, timestamp, topic)
             
-            if(topic in self.cam_topics):
+            elif(topic in self.cam_topics):
                 if(self.sim_data):
                     timestamp = self.cam_sim_frame
                     
                 self.bag_to_img(msg, timestamp, topic)
             
             # ObsData
-            if(topic in self.custom_topics):
+            elif(topic in self.custom_topics):
                 self.obj_to_csv(msg, timestamp, topic)
             
             # ego_pose
-            if(topic in self.csv_topics):
+            elif(topic in self.csv_topics):
                 if(self.sim_data):
                     timestamp = self.cam_sim_frame
                 
